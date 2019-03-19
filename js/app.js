@@ -21,67 +21,115 @@ Treehouse profile name: patleroux
 // Get the 12 random employees from the APi from either the US or Great Britain
 
 const cardGallery = document.querySelector('.gallery');
-//const modalContainer = document.querySelector('.modal-container');
-
 const maxCard = 12;
+const url = 'https://randomuser.me/api/?nat=us,gb&results=' + maxCard;
+const container = document.querySelector('.container');
+
 let allEmployees;
 let closeButton;
 
-getEmployees();
-//openModal();
+
+// ------------------------------------------
+//  FETCH FUNCTIONS
+// ------------------------------------------
+function fetchData(url) {
+    return fetch(url)
+        .then(checkStatus)
+        .then(res => res.json())
+        .catch(error => console.log('Error ', error));
+}
+
+Promise.all([
+        fetchData(url)
+    ])
+    .then(data => {
+        getEmployees();
+    });
+
+// ------------------------------------------
+//  HELPER FUNCTIONS
+// ------------------------------------------
+function checkStatus(response) {
+    if (response.ok) {
+        return Promise.resolve(response);
+    } else {
+        return Promise.reject(new Error(response.statusText));
+    }
+}
+
+function createNode(element) {
+    return document.createElement(element);
+}
+
+function append(parent, el) {
+    return parent.appendChild(el);
+}
+/**********************************************************************/
+
 
 function openModal(index) {
-    const container = document.querySelector('.container');
+    // Modal Container
     const modalContainer = document.createElement('div');
     modalContainer.className = 'modal-container';
 
-    const modal = document.createElement('div');
+    // Modal
+    const modal = createNode('div');
     modal.className = 'modal';
 
+    // Close Button
     const closeButton = document.createElement('button');
     closeButton.className = 'modal-close-btn';
     closeButton.id = 'modalCloseBtn';
     closeButton.innerText = 'X';
 
+    // Modal Information Container
     const modalInfoContainer = document.createElement('div');
     modalInfoContainer.className = 'modal-info-container';
 
-    const img = allEmployees[index].picture.large;
+    // Modal Information: Image
     const modalImg = document.createElement('img');
+    const img = allEmployees[index].picture.large;
     modalImg.className = 'modal-img';
     modalImg.src = img;
     modalImg.alt = 'profile picture';
     modalInfoContainer.appendChild(modalImg);
 
+    // Modal Information: Name
     const nameH3 = document.createElement('h3');
     nameH3.className = 'modal-name cap';
     nameH3.id = index;
     nameH3.innerText = allEmployees[index].name.first + ' ' + allEmployees[index].name.last;;
     modalInfoContainer.appendChild(nameH3);
 
+    // Modal Information: eMail
     const eMailP = document.createElement('p');
     eMailP.className = 'modal-text';
     eMailP.innerText = allEmployees[index].email;
     modalInfoContainer.appendChild(eMailP);
 
+    // Modal Information: Location
     const locationP = document.createElement('p');
     locationP.className = 'modal-text cap';
     locationP.innerText = allEmployees[index].location.city;
     modalInfoContainer.appendChild(locationP);
 
+    // Modal Information: hr
     const hr = document.createElement('hr');
     modalInfoContainer.appendChild(hr);
 
+    // Modal Information: Phone   
     const phone = document.createElement('p');
     phone.className = 'modal-text';
-    phone.innerText = allEmployees[index].phone;
+    phone.innerText = allEmployees[index].cell;
     modalInfoContainer.appendChild(phone);
 
+    // Modal Information: Adresse
     const addr = document.createElement('p');
     addr.className = 'modal-text';
     addr.innerText = allEmployees[index].location.street + ' ' + allEmployees[index].location.state + ' ' + allEmployees[index].location.postcode;
     modalInfoContainer.appendChild(addr);
 
+    // Modal Information: Birthday
     const birthday = document.createElement('p');
     birthday.className = 'modal-text';
     const date = allEmployees[index].dob.date;
@@ -92,14 +140,16 @@ function openModal(index) {
     modalInfoContainer.appendChild(birthday);
 
 
+    // Build Modal
     modal.appendChild(closeButton);
     modal.appendChild(modalInfoContainer);
     modalContainer.appendChild(modal);
     container.appendChild(modalContainer);
 
-    modalContainer.style.display = 'inline';
+    modalContainer.style.display = 'block';
 
 }
+
 
 
 function getEmployees() {
